@@ -30,9 +30,14 @@ public class AppUser {
     private String role;
 
     @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    protected AppUser() {}
+    public AppUser() {}
+
+    public Long getId() {
+        return id;
+    }
 
     public String getUsername() {
         return username;

@@ -6,6 +6,7 @@ services:
       POSTGRES_USER: splash
       POSTGRES_PASSWORD: password
       PGDATA: /data/postgres
+      POSTGRES_DB: splashStore
     ports:
       - "5433:5432"
     volumes:
