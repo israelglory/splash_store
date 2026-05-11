@@ -12,7 +12,7 @@ public class Category {
     @NotBlank
     private String categoryName;
 
-    Category() {}
+    public Category() {}
 
     public Long getCategoryId() {
         return categoryId;

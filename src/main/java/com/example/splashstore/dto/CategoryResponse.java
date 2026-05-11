@@ -1,10 +1,17 @@
 package com.example.splashstore.dto;
 
-import jakarta.validation.constraints.NotBlank;
+public class CategoryResponse {
 
-public class CategoryRequest {
-    @NotBlank
+    private Long categoryId;
     private String categoryName;
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
 
     public String getCategoryName() {
         return categoryName;
@@ -14,3 +21,4 @@ public class CategoryRequest {
         this.categoryName = categoryName;
     }
 }
+

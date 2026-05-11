@@ -2,13 +2,17 @@ package com.example.splashstore.controller;
 
 
 import com.example.splashstore.dto.CategoryRequest;
-import com.example.splashstore.model.Category;
+import com.example.splashstore.dto.CategoryResponse;
 import com.example.splashstore.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/category")
@@ -24,14 +28,32 @@ public class CategoryController {
 
     @PostMapping
     @Operation(summary = "Create a category")
-    public ResponseEntity<Category> addCategory(@RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.addCategory(category));
+    public ResponseEntity<CategoryResponse> addCategory(@Valid @RequestBody CategoryRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.addCategory(request));
+    }
+
+    @GetMapping
+    @Operation(summary = "Get all categories")
+    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
+        return ResponseEntity.ok(categoryService.getAllCategories());
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get a category by ID")
+    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long id) {
+        return ResponseEntity.ok(categoryService.getCategoryById(id));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update a category by ID")
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryRequest request) {
+        return ResponseEntity.ok(categoryService.updateCategory(id, request));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a category by ID")
-    public void deleteCategory(@PathVariable Long id) {
-        categoryService.deleteCategoryById(id);
+    public ResponseEntity<CategoryResponse> deleteCategory(@PathVariable Long id) {
+        return ResponseEntity.ok(categoryService.deleteCategoryById(id));
     }
 
 
