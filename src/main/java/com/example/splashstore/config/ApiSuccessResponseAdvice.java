@@ -13,6 +13,8 @@ import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import java.net.URI;
+
 @RestControllerAdvice
 public class ApiSuccessResponseAdvice implements ResponseBodyAdvice<Object> {
 
@@ -30,6 +32,10 @@ public class ApiSuccessResponseAdvice implements ResponseBodyAdvice<Object> {
             @NonNull ServerHttpRequest request,
             @NonNull ServerHttpResponse response
     ) {
+        if (isSwaggerRequest(request)) {
+            return body;
+        }
+
         if (!isSuccessStatus(response)) {
             return body;
         }
@@ -46,6 +52,14 @@ public class ApiSuccessResponseAdvice implements ResponseBodyAdvice<Object> {
         }
 
         return wrapped;
+    }
+
+    private boolean isSwaggerRequest(ServerHttpRequest request) {
+        URI uri = request.getURI();
+        String path = uri.getPath();
+        return path.startsWith("/v3/api-docs")
+                || path.startsWith("/swagger-ui")
+                || path.equals("/swagger-ui.html");
     }
 
     private boolean isSuccessStatus(ServerHttpResponse response) {

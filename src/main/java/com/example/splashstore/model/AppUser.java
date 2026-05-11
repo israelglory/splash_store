@@ -3,6 +3,8 @@ package com.example.splashstore.model;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "app_user")
@@ -32,6 +34,9 @@ public class AppUser {
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AddressModel> addresses = new ArrayList<>();
 
     public AppUser() {}
 
@@ -85,6 +90,14 @@ public class AppUser {
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
 
+    }
+
+    public List<AddressModel> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<AddressModel> addresses) {
+        this.addresses = addresses;
     }
 
 

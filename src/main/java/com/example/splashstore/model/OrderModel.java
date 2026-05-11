@@ -26,8 +26,9 @@ public class OrderModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 500)
-    private String address;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id", nullable = false)
+    private AddressModel address;
 
     @Column(nullable = false)
     private String status = "PENDING";
@@ -56,11 +57,11 @@ public class OrderModel {
         this.id = id;
     }
 
-    public String getAddress() {
+    public AddressModel getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(AddressModel address) {
         this.address = address;
     }
 

@@ -1,26 +1,26 @@
 package com.example.splashstore.dto;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
 public class OrderRequest {
 
-    @NotBlank
-    private String address;
+    @NotNull
+    private Long addressId;
 
     @NotEmpty
     @Valid
     private List<OrderItemRequest> items;
 
-    public String getAddress() {
-        return address;
+    public Long getAddressId() {
+        return addressId;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setAddressId(Long addressId) {
+        this.addressId = addressId;
     }
 
     public List<OrderItemRequest> getItems() {

@@ -7,7 +7,7 @@ import java.util.List;
 public class OrderResponse {
 
     private Long id;
-    private String address;
+    private AddressResponse address;
     private String status;
     private BigDecimal totalAmount;
     private UserResponse createdBy;
@@ -22,11 +22,11 @@ public class OrderResponse {
         this.id = id;
     }
 
-    public String getAddress() {
+    public AddressResponse getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(AddressResponse address) {
         this.address = address;
     }
 

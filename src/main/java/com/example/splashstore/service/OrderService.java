@@ -4,11 +4,14 @@ import com.example.splashstore.dto.OrderItemRequest;
 import com.example.splashstore.dto.OrderItemResponse;
 import com.example.splashstore.dto.OrderRequest;
 import com.example.splashstore.dto.OrderResponse;
+import com.example.splashstore.dto.AddressResponse;
 import com.example.splashstore.dto.UserResponse;
+import com.example.splashstore.model.AddressModel;
 import com.example.splashstore.model.AppUser;
 import com.example.splashstore.model.OrderItemModel;
 import com.example.splashstore.model.OrderModel;
 import com.example.splashstore.model.ProductModel;
+import com.example.splashstore.repository.AddressRepository;
 import com.example.splashstore.repository.OrderRepository;
 import com.example.splashstore.repository.ProductRepository;
 import com.example.splashstore.repository.AppUserRepository;
@@ -28,11 +31,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final AppUserRepository userRepository;
+    private final AddressRepository addressRepository;
 
-    public OrderService(OrderRepository orderRepository, ProductRepository productRepository, AppUserRepository userRepository) {
+    public OrderService(OrderRepository orderRepository, ProductRepository productRepository, AppUserRepository userRepository, AddressRepository addressRepository) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.addressRepository = addressRepository;
     }
 
     private AppUser getCurrentUser() {
@@ -47,9 +52,17 @@ public class OrderService {
     @Transactional
     public OrderResponse createOrder(OrderRequest request) {
         AppUser currentUser = getCurrentUser();
+        AddressModel address = addressRepository.findById(request.getAddressId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Address not found"));
+
+        boolean isOwner = address.getUser() != null && address.getUser().getId().equals(currentUser.getId());
+        boolean isAdmin = currentUser.getRole() != null && currentUser.getRole().equalsIgnoreCase("admin");
+        if (!isOwner && !isAdmin) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to use this address");
+        }
 
         OrderModel order = new OrderModel();
-        order.setAddress(request.getAddress());
+        order.setAddress(address);
         order.setCreatedBy(currentUser);
         order.setStatus("PENDING");
         order.setTotalAmount(BigDecimal.ZERO);
@@ -122,7 +135,7 @@ public class OrderService {
     private OrderResponse mapToResponse(OrderModel order) {
         OrderResponse response = new OrderResponse();
         response.setId(order.getId());
-        response.setAddress(order.getAddress());
+        response.setAddress(mapAddressToResponse(order.getAddress()));
         response.setStatus(order.getStatus());
         response.setTotalAmount(order.getTotalAmount());
         response.setCreatedAt(order.getCreatedAt());
@@ -143,6 +156,25 @@ public class OrderService {
                 .map(this::mapItemToResponse)
                 .toList();
         response.setItems(itemResponses);
+        return response;
+    }
+
+    private AddressResponse mapAddressToResponse(AddressModel address) {
+        if (address == null) {
+            return null;
+        }
+
+        AddressResponse response = new AddressResponse();
+        response.setId(address.getId());
+        response.setLabel(address.getLabel());
+        response.setStreet(address.getStreet());
+        response.setCity(address.getCity());
+        response.setState(address.getState());
+        response.setPostalCode(address.getPostalCode());
+        response.setCountry(address.getCountry());
+        response.setPhone(address.getPhone());
+        response.setIsDefault(address.getIsDefault());
+        response.setCreatedAt(address.getCreatedAt());
         return response;
     }
 
