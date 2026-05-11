@@ -3,6 +3,7 @@ package com.example.splashstore.service;
 import com.example.splashstore.dto.AuthRequest;
 import com.example.splashstore.dto.AuthResponse;
 import com.example.splashstore.dto.SignupRequest;
+import com.example.splashstore.dto.UserResponse;
 import com.example.splashstore.model.AppUser;
 import com.example.splashstore.repository.AppUserRepository;
 import com.example.splashstore.security.AppUserDetails;
@@ -71,6 +72,16 @@ public class AuthService {
         AppUser user = userDetails.getUser();
         String token = jwtService.generateToken(userDetails);
         return new AuthResponse(token, user.getId(), user.getEmail(), user.getUsername(), user.getRole());
+    }
+    public UserResponse getCurrentUser(AppUserDetails userDetails) {
+        AppUser user = userDetails.getUser();
+        return new UserResponse(user.getId(), user.getEmail(), user.getUsername(), user.getRole(), user.getFullname(), user.getPhone());
+    }
+
+    public UserResponse getUserById(Long userId) {
+        return appUserRepository.findById(userId)
+                .map(user -> new UserResponse(user.getId(), user.getEmail(), user.getUsername(), user.getRole(), user.getFullname(), user.getPhone()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 }
 

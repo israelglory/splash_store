@@ -92,12 +92,30 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.UNAUTHORIZED, "Invalid or expired token", request, null);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalArgument(
+            IllegalArgumentException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage() != null ? ex.getMessage() : "Invalid argument", request, null);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiErrorResponse> handleRuntime(
+            RuntimeException ex,
+            HttpServletRequest request
+    ) {
+        String message = ex.getMessage() != null ? ex.getMessage() : "Unexpected server error";
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, message, request, null);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleUnexpected(
             Exception ex,
             HttpServletRequest request
     ) {
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected server error", request, null);
+        String message = ex.getMessage() != null ? ex.getMessage() : "Unexpected server error";
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, message, request, null);
     }
 
     private ResponseEntity<ApiErrorResponse> build(
