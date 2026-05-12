@@ -1,12 +1,12 @@
 services:
   db:
-    container_name: postgres-splashStore
+    container_name: postgres-splashstore
     image: postgres:latest
     environment:
       POSTGRES_USER: splash
       POSTGRES_PASSWORD: password
       PGDATA: /data/postgres
-      POSTGRES_DB: splashStore
+      POSTGRES_DB: splashstore
     ports:
       - "5433:5432"
     volumes:
