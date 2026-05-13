@@ -35,7 +35,7 @@ public class AddressController {
         return ResponseEntity.status(HttpStatus.CREATED).body(addressService.createAddress(request));
     }
 
-    @GetMapping("/me")
+    @GetMapping
     @Operation(summary = "Get my addresses")
     public ResponseEntity<List<AddressResponse>> getMyAddresses() {
         return ResponseEntity.ok(addressService.getMyAddresses());

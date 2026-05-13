@@ -5,134 +5,119 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 
-import java.time.Instant;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiErrorResponse> handleValidation(
+    public ResponseEntity<ErrorResponse> handleValidation(
             MethodArgumentNotValidException ex,
             HttpServletRequest request
     ) {
-        Map<String, String> fieldErrors = new LinkedHashMap<>();
-        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
-            fieldErrors.putIfAbsent(fieldError.getField(), fieldError.getDefaultMessage());
-        }
-        return build(HttpStatus.BAD_REQUEST, "Validation failed", request, fieldErrors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("Validation failed"));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiErrorResponse> handleConstraintViolation(
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(
             ConstraintViolationException ex,
             HttpServletRequest request
     ) {
-        return build(HttpStatus.BAD_REQUEST, ex.getMessage(), request, null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiErrorResponse> handleMalformedBody(
+    public ResponseEntity<ErrorResponse> handleMalformedBody(
             HttpMessageNotReadableException ex,
             HttpServletRequest request
     ) {
-        return build(HttpStatus.BAD_REQUEST, "Malformed request body", request, null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("Malformed request body"));
     }
 
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<ApiErrorResponse> handleResponseStatus(
+    public ResponseEntity<ErrorResponse> handleResponseStatus(
             ResponseStatusException ex,
             HttpServletRequest request
     ) {
         String message = ex.getReason() != null ? ex.getReason() : "Request failed";
-        return build(ex.getStatusCode(), message, request, null);
+        return ResponseEntity.status(ex.getStatusCode())
+                .body(new ErrorResponse(message));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiErrorResponse> handleConflict(
+    public ResponseEntity<ErrorResponse> handleConflict(
             DataIntegrityViolationException ex,
             HttpServletRequest request
     ) {
-        return build(HttpStatus.CONFLICT, "Data integrity violation", request, null);
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse("Data integrity violation"));
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ApiErrorResponse> handleAuthentication(
+    public ResponseEntity<ErrorResponse> handleAuthentication(
             AuthenticationException ex,
             HttpServletRequest request
     ) {
-        return build(HttpStatus.UNAUTHORIZED, "Authentication failed", request, null);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse("Invalid email or password"));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiErrorResponse> handleAccessDenied(
+    public ResponseEntity<ErrorResponse> handleAccessDenied(
             AccessDeniedException ex,
             HttpServletRequest request
     ) {
-        return build(HttpStatus.FORBIDDEN, "Access denied", request, null);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse("Access denied"));
     }
 
     @ExceptionHandler(JwtException.class)
-    public ResponseEntity<ApiErrorResponse> handleJwt(
+    public ResponseEntity<ErrorResponse> handleJwt(
             JwtException ex,
             HttpServletRequest request
     ) {
-        return build(HttpStatus.UNAUTHORIZED, "Invalid or expired token", request, null);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse("Invalid or expired token"));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiErrorResponse> handleIllegalArgument(
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(
             IllegalArgumentException ex,
             HttpServletRequest request
     ) {
-        return build(HttpStatus.BAD_REQUEST, ex.getMessage() != null ? ex.getMessage() : "Invalid argument", request, null);
+        String message = ex.getMessage() != null ? ex.getMessage() : "Invalid argument";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(message));
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiErrorResponse> handleRuntime(
+    public ResponseEntity<ErrorResponse> handleRuntime(
             RuntimeException ex,
             HttpServletRequest request
     ) {
         String message = ex.getMessage() != null ? ex.getMessage() : "Unexpected server error";
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, message, request, null);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(message));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponse> handleUnexpected(
+    public ResponseEntity<ErrorResponse> handleUnexpected(
             Exception ex,
             HttpServletRequest request
     ) {
         String message = ex.getMessage() != null ? ex.getMessage() : "Unexpected server error";
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, message, request, null);
-    }
-
-    private ResponseEntity<ApiErrorResponse> build(
-            HttpStatusCode status,
-            String message,
-            HttpServletRequest request,
-            Map<String, String> validationErrors
-    ) {
-        ApiErrorResponse body = new ApiErrorResponse(
-                Instant.now(),
-                status.value(),
-                HttpStatus.valueOf(status.value()).getReasonPhrase(),
-                message,
-                request.getRequestURI(),
-                validationErrors
-        );
-        return ResponseEntity.status(status).body(body);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(message));
     }
 }
 

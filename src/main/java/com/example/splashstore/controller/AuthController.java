@@ -35,10 +35,10 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "Get a user by ID")
-    public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(authService.getUserById(id));
-    }
+//    @GetMapping("/{id}")
+//    @Operation(summary = "Get a user by ID")
+//    public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
+//        return ResponseEntity.ok(authService.getUserById(id));
+//    }
 }
 

@@ -47,7 +47,7 @@ public class OrderController {
     }
 
     @GetMapping
-    @Operation(summary = "Get all orders")
+    @Operation(summary = "Get all orders (admin only)")
     public ResponseEntity<List<OrderResponse>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
