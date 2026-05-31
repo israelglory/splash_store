@@ -7,12 +7,22 @@ public class AuthResponse {
     private String email;
     private String username;
     private String role;
+    private String refreshToken;
 
     public AuthResponse() {
     }
 
     public AuthResponse(String token, Long id, String email, String username, String role) {
         this.token = token;
+        this.id = id;
+        this.email = email;
+        this.username = username;
+        this.role = role;
+    }
+
+    public AuthResponse(String token, String refreshToken, Long id, String email, String username, String role) {
+        this.token = token;
+        this.refreshToken = refreshToken;
         this.id = id;
         this.email = email;
         this.username = username;
@@ -65,6 +75,14 @@ public class AuthResponse {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
 
